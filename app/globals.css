@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --surface: #111111;
+  --foreground: #f4f1ec;
+  --muted: #8a8680;
+  --line: rgba(244, 241, 236, 0.12);
+  --line-strong: rgba(244, 241, 236, 0.22);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-clash);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* Do NOT set overflow on body/html — Chromium disables
+     backdrop-filter on position:fixed descendants when ancestors
+     have overflow other than visible. Safari is more permissive. */
+}
+
+main {
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(244, 241, 236, 0.2);
+  color: #0a0a0a;
+}
+
+.font-display {
+  font-family: var(--font-clash), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/*
+  Shared frost glass — blur must be applied INLINE (see hero/navbar).
+  Large panels over busy 3D backdrops posterize if the fill is too thin;
+  denser tint + micro-noise breaks banding while keeping frost.
+*/
+.glass-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: rgba(10, 10, 10, 0.72);
+  border-color: rgba(244, 241, 236, 0.22);
+  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.1);
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  mix-blend-mode: overlay;
+}
+
+.glass-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-glass {
+  background: rgba(12, 12, 12, 0.38);
+  border-color: rgba(244, 241, 236, 0.22);
+  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.1);
+  transition:
+    background 280ms ease,
+    box-shadow 280ms ease,
+    border-color 280ms ease;
+}
+
+.nav-glass-scrolled {
+  background: rgba(10, 10, 10, 0.52);
+  border-color: rgba(244, 241, 236, 0.26);
+  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.12);
+}
+
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+
+.surface-hover {
+  transition:
+    border-color 280ms ease,
+    background-color 280ms ease;
+}
+
+.surface-hover:hover {
+  border-color: var(--line-strong);
+  background: #141414;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 2px;
+  background: var(--foreground);
+  padding: 0.8rem 1.4rem;
+  font-size: 0.875rem;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+  color: var(--background);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 2px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  padding: 0.8rem 1.4rem;
+  font-size: 0.875rem;
+  font-weight: 560;
+  color: var(--foreground);
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(244, 241, 236, 0.4);
+  background: rgba(244, 241, 236, 0.04);
+}
+
+.section-pad {
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-pad {
+    padding-inline: 3rem;
+  }
+}
+
+.container-max {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-label::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+.vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  /* Soft vignette — avoid stacked dark gradients that band into “scanlines” */
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(10, 10, 10, 0.35) 100%
+  );
+}
+
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .surface-hover:hover {
+    transform: none;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+}

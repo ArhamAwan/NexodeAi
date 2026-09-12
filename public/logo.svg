@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+  <!-- Left hook: bottom ledge ? left leg ? diagonal into center -->
+  <path
+    d="M28 50 H18 C14 50 12 48 12 44 V22 C12 16 16 13 22 17 L34 28"
+    stroke="currentColor"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Right hook: top ledge ? right leg ? diagonal into center -->
+  <path
+    d="M36 14 H46 C50 14 52 16 52 20 V42 C52 48 48 51 42 47 L30 36"
+    stroke="currentColor"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
