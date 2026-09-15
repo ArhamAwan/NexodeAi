@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --surface: #111111;
-  --foreground: #f4f1ec;
-  --muted: #8a8680;
-  --line: rgba(244, 241, 236, 0.12);
-  --line-strong: rgba(244, 241, 236, 0.22);
+  --background: #000000;
+  --surface: #0a0a0a;
+  --foreground: #e8e8e8;
+  --muted: #8a8a8a;
+  --line: rgba(232, 232, 232, 0.35);
+  --line-strong: rgba(232, 232, 232, 0.55);
+  --accent: #e8e8e8;
+  --ink: #e8e8e8;
 }
 
 @theme inline {
@@ -15,6 +17,7 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-clash);
@@ -22,92 +25,72 @@
 
 html {
   scroll-behavior: auto;
+  overflow-x: clip;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
-  /* Do NOT set overflow on body/html — Chromium disables
-     backdrop-filter on position:fixed descendants when ancestors
-     have overflow other than visible. Safari is more permissive. */
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
 }
 
 main {
   overflow-x: clip;
 }
 
+.btn-primary,
+.btn-secondary {
+  min-height: 2.75rem;
+  touch-action: manipulation;
+}
+
+@media (max-width: 639px) {
+  .btn-stack-mobile {
+    width: 100%;
+  }
+}
+
 ::selection {
-  background: rgba(244, 241, 236, 0.2);
-  color: #0a0a0a;
+  background: #e8e8e8;
+  color: #000000;
 }
 
 .font-display {
   font-family: var(--font-clash), var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/*
-  Shared frost glass — blur must be applied INLINE (see hero/navbar).
-  Large panels over busy 3D backdrops posterize if the fill is too thin;
-  denser tint + micro-noise breaks banding while keeping frost.
-*/
-.glass-panel {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background: rgba(10, 10, 10, 0.72);
-  border-color: rgba(244, 241, 236, 0.22);
-  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.1);
-}
-
-.glass-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 140px 140px;
-  mix-blend-mode: overlay;
-}
-
-.glass-panel > * {
-  position: relative;
-  z-index: 1;
-}
-
-.nav-glass {
-  background: rgba(12, 12, 12, 0.38);
-  border-color: rgba(244, 241, 236, 0.22);
-  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.1);
-  transition:
-    background 280ms ease,
-    box-shadow 280ms ease,
-    border-color 280ms ease;
-}
-
-.nav-glass-scrolled {
-  background: rgba(10, 10, 10, 0.52);
-  border-color: rgba(244, 241, 236, 0.26);
-  box-shadow: inset 0 1px 0 rgba(244, 241, 236, 0.12);
-}
-
-.surface {
-  background: var(--surface);
+/* Portal grid system */
+.grid-frame {
   border: 1px solid var(--line);
-  border-radius: 2px;
 }
 
-.surface-hover {
-  transition:
-    border-color 280ms ease,
-    background-color 280ms ease;
+.grid-cell {
+  border: 1px solid var(--line);
 }
 
-.surface-hover:hover {
-  border-color: var(--line-strong);
-  background: #141414;
+.grid-rule-y {
+  border-right: 1px solid var(--line);
+}
+
+.grid-rule-x {
+  border-bottom: 1px solid var(--line);
+}
+
+.meta {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 639px) {
+  .meta {
+    letter-spacing: 0.1em;
+  }
 }
 
 .btn-primary {
@@ -115,20 +98,23 @@ main {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 2px;
+  border: 1px solid var(--foreground);
   background: var(--foreground);
-  padding: 0.8rem 1.4rem;
-  font-size: 0.875rem;
-  font-weight: 560;
-  letter-spacing: 0.01em;
+  padding: 0.7rem 1.25rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--background);
   transition:
-    opacity 200ms ease,
-    transform 200ms ease;
+    background 180ms ease,
+    color 180ms ease;
 }
 
 .btn-primary:hover {
-  opacity: 0.92;
+  background: transparent;
+  color: var(--foreground);
 }
 
 .btn-primary:disabled {
@@ -141,43 +127,35 @@ main {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 2px;
   border: 1px solid var(--line-strong);
   background: transparent;
-  padding: 0.8rem 1.4rem;
-  font-size: 0.875rem;
-  font-weight: 560;
+  padding: 0.7rem 1.25rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--foreground);
   transition:
-    border-color 200ms ease,
-    background-color 200ms ease;
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
 }
 
 .btn-secondary:hover {
-  border-color: rgba(244, 241, 236, 0.4);
-  background: rgba(244, 241, 236, 0.04);
+  background: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
 }
 
 .section-pad {
-  padding-inline: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .section-pad {
-    padding-inline: 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .section-pad {
-    padding-inline: 3rem;
-  }
+  padding-inline: 0;
 }
 
 .container-max {
   margin-inline: auto;
   width: 100%;
-  max-width: 72rem;
+  max-width: none;
 }
 
 .section-label {
@@ -186,36 +164,75 @@ main {
   gap: 0.75rem;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.section-label::before {
-  content: "";
-  width: 1.5rem;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.hairline {
-  border-color: var(--line);
-}
-
-.vignette {
-  pointer-events: none;
+/* Tunnel rings */
+.tunnel {
   position: absolute;
   inset: 0;
-  /* Soft vignette — avoid stacked dark gradients that band into “scanlines” */
-  background: radial-gradient(
-    ellipse at center,
-    transparent 50%,
-    rgba(10, 10, 10, 0.35) 100%
-  );
+  display: grid;
+  place-items: center;
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.tunnel-ring {
+  position: absolute;
+  border: 1px solid rgba(232, 232, 232, 0.55);
+  border-radius: 999px;
+  aspect-ratio: 16 / 10;
+  width: var(--ring-w, 40%);
+  transform: translateZ(var(--ring-z, 0px)) scale(var(--ring-s, 1));
+}
+
+.tunnel-ring-strong {
+  border-width: 1.5px;
+  border-color: rgba(232, 232, 232, 0.75);
+  box-shadow: 0 0 24px rgba(232, 232, 232, 0.08);
+}
+
+.portal-tunnel {
+  transform-origin: center;
+  animation: portal-spin 48s linear infinite;
+}
+
+.portal-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.2;
+  animation: portal-pulse 3.3s ease-in-out infinite;
+}
+
+@keyframes portal-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes portal-pulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.92);
+  }
+  45% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
 }
 
 .marquee-track {
-  animation: marquee 32s linear infinite;
+  animation: marquee 28s linear infinite;
+}
+
+.marquee-track-reverse {
+  animation: marquee-reverse 32s linear infinite;
 }
 
 @keyframes marquee {
@@ -227,14 +244,44 @@ main {
   }
 }
 
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Keep glass usable for funnel only — monochrome */
+.glass-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 0;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid var(--line);
+}
+
+.glass-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nav-glass {
+  background: #000;
+  border-color: var(--line);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .btn-primary:hover,
-  .btn-secondary:hover,
-  .surface-hover:hover {
-    transform: none;
+  .marquee-track,
+  .marquee-track-reverse,
+  .portal-tunnel,
+  .portal-ring {
+    animation: none;
   }
 
-  .marquee-track {
-    animation: none;
+  .portal-ring {
+    opacity: 0.4;
   }
 }

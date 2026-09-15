@@ -189,18 +189,15 @@ export function About() {
   const label = team[active] ?? team[0];
 
   return (
-    <section
-      id="about"
-      className="border-t border-[var(--line)] py-16 sm:py-20 md:py-28 lg:pb-0 lg:pt-0"
-    >
-      <div className="container-max section-pad">
+    <section id="about" className="border-b border-[var(--line)]">
+      <div className="border-b border-[var(--line)] px-4 py-8 sm:px-6 md:px-8">
         <Reveal>
-          <div className="lg:pt-28">
-            <p className="section-label">Team</p>
-            <h2 className="font-display mt-5 max-w-3xl text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl md:text-5xl">
+          <div>
+            <p className="meta">About</p>
+            <h2 className="font-display mt-3 max-w-3xl text-3xl font-semibold tracking-tight uppercase sm:text-4xl md:text-5xl">
               Meet the people behind Nexode
             </h2>
-            <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-muted sm:mt-8 md:text-lg">
+            <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-muted normal-case tracking-normal md:text-base">
               {about.studio}
             </p>
           </div>
@@ -208,23 +205,23 @@ export function About() {
       </div>
 
       {/* Mobile / tablet — sticky pages that flow away */}
-      <div className="relative mt-10 lg:hidden">
+      <div className="relative lg:hidden">
         {team.map((person, i) => (
           <div
             key={person.name}
             ref={(el) => {
               mobilePageRefs.current[i] = el;
             }}
-            className="sticky top-0 flex h-[100svh] items-center overflow-hidden bg-[#0A0A0A]"
+            className="sticky top-[calc(3.25rem+env(safe-area-inset-top))] flex h-[calc(100svh-3.25rem-env(safe-area-inset-top))] max-h-[100dvh] items-center overflow-hidden bg-black"
             style={{ zIndex: i + 1 }}
           >
             <div
               ref={(el) => {
                 mobileInnerRefs.current[i] = el;
               }}
-              className="container-max section-pad w-full pt-20 pb-8"
+              className="container-max w-full px-4 py-6 sm:px-6 sm:py-8"
             >
-              <div className="relative mx-auto aspect-square w-full max-w-[min(24rem,48svh)] overflow-hidden border border-[var(--line)] bg-[#0A0A0A]">
+              <div className="relative mx-auto aspect-square w-full max-w-[min(22rem,42svh)] overflow-hidden border border-[var(--line)] bg-black sm:max-w-[min(24rem,48svh)]">
                 <Image
                   src={person.image}
                   alt={person.name}
@@ -259,10 +256,10 @@ export function About() {
       </div>
 
       {/* Desktop — sticky portrait stage + scrolling dossiers */}
-      <div className="container-max section-pad">
-        <div className="relative mt-16 hidden grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-14 pb-28 lg:grid xl:gap-20">
-          <div className="sticky top-28 self-start">
-            <div className="relative aspect-square w-full overflow-hidden border border-[var(--line)] bg-[#0A0A0A]">
+      <div className="px-4 sm:px-6 md:px-8">
+        <div className="relative mt-0 hidden grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-0 pb-0 lg:grid">
+          <div className="sticky top-24 self-start border-r border-[var(--line)] py-10 pr-6 xl:py-14 xl:pr-10">
+            <div className="relative aspect-square w-full overflow-hidden border border-[var(--line)] bg-black">
               <Image
                 src={stageOut.image}
                 alt={stageOut.name}
@@ -300,7 +297,7 @@ export function About() {
             </div>
           </div>
 
-          <div className="flex flex-col pt-4">
+          <div className="flex flex-col pl-10 pt-4">
             {team.map((person, i) => {
               const isActive = reduced || active === i;
               return (

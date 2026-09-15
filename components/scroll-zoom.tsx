@@ -1,89 +1,116 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { narrative } from "@/content/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const RINGS = [
+  { w: 22, z: -180 },
+  { w: 34, z: -120 },
+  { w: 46, z: -60 },
+  { w: 58, z: 0 },
+  { w: 72, z: 60 },
+  { w: 88, z: 120 },
+];
+
 /**
- * SahulatPay-style sticky zoom: card expands from inset to full-bleed on scroll.
- * Works on all viewports; reduced-motion gets a static full-bleed panel.
+ * Tunnel zoom — pins only when this section hits the top of the viewport,
+ * then scrubs the ring zoom. Does nothing while you're still on the hero.
  */
 export function ScrollZoom() {
   const wrapRef = useRef<HTMLElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
-    const card = cardRef.current;
+    const pin = pinRef.current;
+    const stage = stageRef.current;
     const copy = copyRef.current;
-    if (!wrap || !card) return;
+    if (!wrap || !pin || !stage) return;
 
+    const rings = stage.querySelectorAll<HTMLElement>(".tunnel-ring");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (reduced) {
-      gsap.set(card, {
-        width: "100%",
-        height: "100%",
-        borderRadius: 0,
+    // Always start at the "before scroll" pose
+    const setStartPose = () => {
+      rings.forEach((el, i) => {
+        const z = RINGS[i]?.z ?? 0;
+        gsap.set(el, {
+          z,
+          scale: 0.55 + i * 0.08,
+          opacity: 0.25 + i * 0.1,
+          force3D: true,
+        });
       });
-      if (copy) gsap.set(copy, { opacity: 1 });
-      return;
-    }
+      if (copy) gsap.set(copy, { autoAlpha: 1, scale: 1 });
+    };
 
-    const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
+    setStartPose();
+
+    if (reduced) return;
 
     const ctx = gsap.context(() => {
-      gsap.set(card, {
-        width: () =>
-          isMobile()
-            ? Math.min(window.innerWidth - 32, window.innerWidth * 0.88)
-            : Math.min(window.innerWidth - 64, 920),
-        height: () =>
-          isMobile()
-            ? Math.min(window.innerHeight * 0.48, 360)
-            : Math.min(window.innerHeight * 0.58, 520),
-        borderRadius: () => (isMobile() ? 20 : 28),
-      });
-      if (copy) gsap.set(copy, { opacity: 0.35 });
-
       const tl = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
           trigger: wrap,
+          // Only when this section reaches the top of the viewport
           start: "top top",
-          end: "bottom bottom",
-          scrub: isMobile() ? 0.45 : 0.65,
+          end: () =>
+            `+=${Math.round(
+              window.innerHeight * (window.matchMedia("(max-width: 767px)").matches ? 1.1 : 1.4),
+            )}`,
+          pin: pin,
+          pinSpacing: true,
+          scrub: 0.65,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
+          onRefresh: (self) => {
+            if (self.progress === 0) setStartPose();
+          },
         },
       });
 
-      tl.to(
-        card,
-        {
-          width: () => window.innerWidth,
-          height: () => window.innerHeight,
-          borderRadius: 0,
-          ease: "none",
-          duration: 0.65,
-        },
-        0,
-      );
+      rings.forEach((el, i) => {
+        tl.to(
+          el,
+          {
+            z: (RINGS[i]?.z ?? 0) + 220,
+            scale: 1.35 + i * 0.12,
+            opacity: i < 2 ? 0 : 0.85,
+            duration: 1,
+          },
+          0,
+        );
+      });
 
       if (copy) {
-        tl.to(copy, { opacity: 1, ease: "none", duration: 0.35 }, 0.2);
+        tl.to(
+          copy,
+          {
+            autoAlpha: 0,
+            scale: 1.12,
+            duration: 0.5,
+          },
+          0.15,
+        );
       }
     }, wrap);
 
-    const onResize = () => ScrollTrigger.refresh();
-    window.addEventListener("resize", onResize);
-    const refreshId = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", refresh);
+    // Layout / font settle
+    const t1 = window.setTimeout(refresh, 100);
+    const t2 = window.setTimeout(refresh, 400);
 
     return () => {
-      window.cancelAnimationFrame(refreshId);
-      window.removeEventListener("resize", onResize);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener("resize", refresh);
       ctx.revert();
     };
   }, []);
@@ -91,40 +118,38 @@ export function ScrollZoom() {
   return (
     <section
       ref={wrapRef}
-      className="relative h-[180vh] w-full md:h-[220vh]"
-      aria-label="Studio manifesto"
+      className="relative border-b border-[var(--line)]"
+      aria-label="Portal zoom"
     >
-      <div className="sticky top-0 flex h-svh w-full items-center justify-center overflow-hidden">
+      <div
+        ref={pinRef}
+        className="relative flex h-[100svh] max-h-[100dvh] items-center justify-center overflow-hidden bg-black"
+      >
         <div
-          ref={cardRef}
-          className="relative overflow-hidden border border-[var(--line)] bg-[#111] will-change-[width,height,border-radius]"
+          ref={stageRef}
+          className="tunnel relative h-full w-full"
+          style={{ perspective: "1000px" }}
         >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              background:
-                "radial-gradient(ellipse at 60% 40%, rgba(244,241,236,0.08), transparent 55%), radial-gradient(ellipse at 20% 80%, rgba(244,241,236,0.04), transparent 45%)",
-            }}
-            aria-hidden
-          />
-          <div
-            ref={copyRef}
-            className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center sm:px-8"
-          >
-            <p className="font-mono text-[10px] tracking-[0.2em] text-muted uppercase">
-              {narrative.label}
-            </p>
-            <h2 className="font-display mt-5 max-w-4xl text-3xl leading-[1.05] font-semibold tracking-[-0.03em] sm:mt-6 sm:text-4xl md:text-6xl lg:text-7xl xl:text-[clamp(3.5rem,5vw,5rem)]">
-              {narrative.headlineLines.map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted sm:mt-8 md:text-base">
-              Ambition deserves software that finally shows what you&apos;ve built.
-            </p>
-          </div>
+          {RINGS.map((ring) => (
+            <div
+              key={ring.w}
+              className="tunnel-ring will-change-transform"
+              style={
+                {
+                  "--ring-w": `${ring.w}%`,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </div>
+        <div
+          ref={copyRef}
+          className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 px-5 text-center will-change-[opacity,transform] sm:gap-3 sm:px-6"
+        >
+          <p className="meta">Enter the build</p>
+          <p className="font-display max-w-2xl text-[clamp(1.2rem,5vw,3rem)] font-semibold tracking-tight uppercase sm:text-3xl md:text-4xl lg:text-5xl">
+            From brief to live product
+          </p>
         </div>
       </div>
     </section>

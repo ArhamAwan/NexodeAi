@@ -120,7 +120,7 @@ export function CalendlyModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-black/70 p-4 sm:items-center"
+      className="fixed inset-0 z-[70] flex items-end justify-center bg-black/70 p-3 pb-[env(safe-area-inset-bottom)] sm:items-center sm:p-4"
       role="presentation"
       onClick={onClose}
     >
@@ -128,7 +128,7 @@ export function CalendlyModal({
         role="dialog"
         aria-modal="true"
         aria-label="Book a call"
-        className="surface max-h-[90vh] w-full max-w-2xl overflow-y-auto p-4 md:p-6"
+        className="surface max-h-[min(90vh,90dvh)] w-full max-w-2xl overflow-y-auto rounded-none border border-[var(--line)] bg-black p-4 md:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">

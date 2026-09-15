@@ -7,7 +7,6 @@ type FooterProps = {
   onCta?: () => void;
 };
 
-/** Slim site footer — intake lives in the floating funnel, not here. */
 export function Footer({ onCta }: FooterProps) {
   const social = [
     { label: "LinkedIn", href: siteConfig.social.linkedin },
@@ -16,23 +15,26 @@ export function Footer({ onCta }: FooterProps) {
   ].filter((s) => Boolean(s.href));
 
   return (
-    <footer className="section-pad border-t border-[var(--line)] py-10 md:py-12">
-      <div className="container-max flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <p className="font-display text-sm font-semibold tracking-tight">
+    <footer className="border-t border-[var(--line)]">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3">
+        <div className="border-b border-[var(--line)] p-6 sm:border-r sm:border-[var(--line)] lg:border-b-0">
+          <p className="font-display text-sm font-semibold tracking-[0.06em] uppercase">
             {siteConfig.name}
           </p>
           <a
             href={`mailto:${siteConfig.contactEmail}`}
-            className="text-sm text-muted transition-colors hover:text-foreground"
+            className="meta mt-4 block normal-case tracking-normal text-muted hover:text-foreground"
             onClick={() => trackCta("contact_email", "footer")}
           >
             {siteConfig.contactEmail}
           </a>
+        </div>
+
+        <div className="border-b border-[var(--line)] p-6 lg:border-r lg:border-b-0 lg:border-[var(--line)]">
           {onCta ? (
             <button
               type="button"
-              className="text-sm text-muted underline-offset-4 transition-colors hover:text-foreground hover:underline"
+              className="meta hover:text-foreground"
               data-cta="start_project"
               data-cta-location="footer"
               onClick={() => {
@@ -40,25 +42,30 @@ export function Footer({ onCta }: FooterProps) {
                 onCta();
               }}
             >
-              Start a Project
+              Start a Project →
             </button>
-          ) : null}
+          ) : (
+            <p className="meta">Nexode AI</p>
+          )}
+          <div className="mt-6 flex flex-wrap gap-5">
+            {social.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className="meta hover:text-foreground"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-5 text-sm text-muted">
-          {social.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-foreground"
-            >
-              {item.label}
-            </a>
-          ))}
-          <p className="font-mono text-[11px] tracking-wider uppercase">
-            © {new Date().getFullYear()}
+        <div className="p-6 sm:col-span-2 lg:col-span-1">
+          <p className="meta">© {new Date().getFullYear()}</p>
+          <p className="meta mt-4 normal-case tracking-normal">
+            Custom web, mobile, and AI products.
           </p>
         </div>
       </div>

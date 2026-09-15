@@ -3,15 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
-import { CapabilityStrip } from "@/components/capability-strip";
-import { Narrative } from "@/components/narrative";
 import { ScrollZoom } from "@/components/scroll-zoom";
-import { Portfolio } from "@/components/portfolio";
+import { CapabilityStrip } from "@/components/capability-strip";
+import { MegaCta } from "@/components/mega-cta";
+import { Work } from "@/components/work";
 import { Services } from "@/components/services";
 import { Process } from "@/components/process";
 import { About } from "@/components/about";
-import { Reviews } from "@/components/reviews";
-import { MegaCta } from "@/components/mega-cta";
 import { Funnel } from "@/components/funnel";
 import { Footer } from "@/components/footer";
 import { CalendlyModal } from "@/components/calendly-embed";
@@ -43,21 +41,21 @@ export function HomePage() {
   return (
     <FunnelProvider controller={controller}>
       <SmoothScroll>
-        <Navbar onBookCall={openCalendly} onStartProject={openFunnel} />
-        <main>
-          <Hero onPrimary={openFunnel} onSecondary={openCalendly} />
-          <CapabilityStrip />
-          <Narrative />
-          <ScrollZoom />
-          <Portfolio onBookCall={openCalendly} />
-          <Services />
-          <Process />
-          <About />
-          <Reviews />
-          <MegaCta onCta={openFunnel} />
-          <Funnel variant="full" pagePath="/" rootId="funnel-bottom" />
-          <Footer onCta={openFunnel} />
-        </main>
+        <div className="min-h-screen overflow-x-clip border-x border-[var(--line)] sm:mx-2 md:mx-3 lg:mx-5">
+          <Navbar onBookCall={openCalendly} onStartProject={openFunnel} />
+          <main>
+            <Hero onPrimary={openFunnel} onSecondary={openCalendly} />
+            <ScrollZoom />
+            <CapabilityStrip />
+            <MegaCta onCta={openFunnel} />
+            <Work onBookCall={openCalendly} />
+            <Services />
+            <Process />
+            <About />
+            <Funnel variant="full" pagePath="/" rootId="funnel-bottom" />
+            <Footer onCta={openFunnel} />
+          </main>
+        </div>
         <FloatingFunnel register={register} />
         <CalendlyModal
           open={calendlyOpen}
