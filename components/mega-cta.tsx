@@ -12,86 +12,68 @@ type MegaCtaProps = {
   onCta: () => void;
 };
 
+/** Massive all-caps display lockup — Portal signature type. */
 export function MegaCta({ onCta }: MegaCtaProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const lines = el.querySelectorAll<HTMLElement>("[data-mega-line]");
-    const show = () => {
-      lines.forEach((line) => {
-        line.style.opacity = "1";
-        line.style.transform = "none";
-      });
-    };
-
-    const failsafe = window.setTimeout(show, 1800);
+    const lines = el.querySelectorAll<HTMLElement>("[data-lockup]");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      show();
-      window.clearTimeout(failsafe);
-      return () => window.clearTimeout(failsafe);
+      lines.forEach((l) => {
+        l.style.opacity = "1";
+        l.style.transform = "none";
+      });
+      return;
     }
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         lines,
-        { y: 40, autoAlpha: 0 },
+        { y: 48, autoAlpha: 0 },
         {
           y: 0,
           autoAlpha: 1,
-          duration: 0.85,
+          duration: 0.9,
           stagger: 0.1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 80%",
+            start: "top 75%",
             once: true,
-            onEnter: () => window.clearTimeout(failsafe),
           },
-          onComplete: () => window.clearTimeout(failsafe),
         },
       );
     }, el);
 
-    return () => {
-      window.clearTimeout(failsafe);
-      ctx.revert();
-      show();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section className="section-pad border-t border-[var(--line)] py-20 sm:py-24 md:py-36">
-      <div ref={ref} className="container-max">
-        <h2 className="font-display text-4xl leading-[0.98] font-semibold tracking-[-0.04em] sm:text-5xl md:text-7xl lg:text-8xl">
-          {megaCta.lines.map((line) => (
-            <span key={line} data-mega-line className="block">
-              {line}
-            </span>
-          ))}
-        </h2>
-
+    <section
+      ref={ref}
+      className="border-b border-[var(--line)] px-4 py-14 sm:px-6 sm:py-20 md:py-28"
+    >
+      <h2 className="font-display mx-auto max-w-full text-center text-[clamp(2.5rem,14vw,9rem)] leading-[0.88] font-semibold tracking-[-0.04em] break-words uppercase">
+        {megaCta.lines.map((line) => (
+          <span key={line} data-lockup className="block">
+            {line}
+          </span>
+        ))}
+      </h2>
+      <div className="mt-8 flex justify-center px-2 sm:mt-12">
         <button
           type="button"
-          data-mega-line
-          className="group mt-10 inline-flex items-center gap-3 text-left sm:mt-12"
+          data-lockup
+          className="btn-primary btn-stack-mobile max-w-xs sm:max-w-none"
           onClick={() => {
             trackCta("start_project", "mega_cta");
             onCta();
           }}
         >
-          <span className="font-display text-lg font-semibold tracking-tight sm:text-xl md:text-2xl">
-            {megaCta.cta}
-          </span>
-          <span
-            aria-hidden
-            className="translate-x-0 transition-transform duration-300 group-hover:translate-x-2"
-          >
-            →
-          </span>
+          {megaCta.cta}
         </button>
       </div>
     </section>

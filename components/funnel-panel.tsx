@@ -174,8 +174,8 @@ export function FunnelPanel({
     "border px-2.5 py-1.5 text-xs transition sm:text-sm sm:px-3 sm:py-2";
 
   return (
-    <div id={rootId} className={className} tabIndex={-1}>
-      <div className="mb-5 flex items-start justify-between gap-3">
+    <div id={rootId} className={`relative ${className ?? ""}`} tabIndex={-1}>
+      <div className={`flex items-start justify-between gap-3 ${compact ? "mb-4" : "mb-5"}`}>
         <div>
           <p className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
             {variant === "ads" ? "Intake" : "Tell us your story"}
@@ -198,7 +198,7 @@ export function FunnelPanel({
         </p>
       </div>
 
-      <div className="mb-6 h-px overflow-hidden bg-[var(--line)]">
+      <div className={`h-px overflow-hidden bg-[var(--line)] ${compact ? "mb-4" : "mb-6"}`}>
         <div
           className="h-full bg-foreground transition-all duration-300"
           style={{ width: `${(step / totalSteps) * 100}%` }}
@@ -239,7 +239,7 @@ export function FunnelPanel({
             <span className="text-muted">Anything else? (optional)</span>
             <textarea
               className="mt-2 w-full border border-[var(--line)] bg-background px-3 py-2.5 text-sm outline-none focus:border-[var(--line-strong)]"
-              rows={compact ? 2 : 3}
+              rows={compact ? 1 : 3}
               {...register("notes")}
             />
           </label>
@@ -362,8 +362,8 @@ export function FunnelPanel({
             onEventScheduled={handleBooked}
             className={
               compact
-                ? "calendly-inline-widget min-h-[520px] w-full"
-                : "calendly-inline-widget min-h-[650px] w-full"
+                ? "calendly-inline-widget min-h-[min(520px,70svh)] w-full"
+                : "calendly-inline-widget min-h-[min(650px,75svh)] w-full"
             }
           />
           <button
@@ -383,7 +383,7 @@ export function FunnelPanel({
       ) : null}
 
       {step < calendlyStep ? (
-        <div className="mt-6 flex items-center justify-between gap-3">
+        <div className={`flex items-center justify-between gap-3 ${compact ? "mt-5" : "mt-6"}`}>
           <button
             type="button"
             className="text-sm text-muted hover:text-foreground disabled:opacity-40"
@@ -400,7 +400,7 @@ export function FunnelPanel({
           </button>
           <button
             type="button"
-            className="btn-primary !px-4 !py-2 text-sm"
+            className="btn-primary shrink-0 !px-4 !py-2 text-sm"
             disabled={submitting}
             onClick={() => {
               trackCta("funnel_continue", compact ? "funnel_compact" : "funnel", {

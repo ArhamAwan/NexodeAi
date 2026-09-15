@@ -1,54 +1,47 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { capabilityStrip } from "@/content/site";
 
-gsap.registerPlugin(ScrollTrigger);
+const bandA = [
+  ...capabilityStrip,
+  "Real businesses",
+  "Real software",
+  "Real impact",
+];
+const bandB = [
+  "Ship the product",
+  "Web · Mobile · AI",
+  "Brief to production",
+  "Nexode AI",
+  "Custom builds",
+];
 
+/** Dual bordered marquee bands — Portal language. */
 export function CapabilityStrip() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const row = [...capabilityStrip, ...capabilityStrip];
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        el,
-        { y: 0 },
-        {
-          y: "-8%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: el,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        },
-      );
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
+  const rowA = [...bandA, ...bandA];
+  const rowB = [...bandB, ...bandB];
 
   return (
-    <div ref={rootRef} className="relative overflow-hidden border-y border-[var(--line)] py-5 will-change-transform">
-      <div className="marquee-track flex w-max gap-10 whitespace-nowrap px-4">
-        {row.map((item, i) => (
-          <span
-            key={`${item}-${i}`}
-            className="font-mono text-xs tracking-[0.22em] text-muted uppercase"
-          >
-            {item}
-            <span className="ml-10 text-foreground/25">/</span>
-          </span>
-        ))}
+    <div className="border-b border-[var(--line)]">
+      <div className="overflow-hidden border-b border-[var(--line)] py-3">
+        <div className="marquee-track flex w-max gap-8 whitespace-nowrap px-4">
+          {rowA.map((item, i) => (
+            <span key={`a-${item}-${i}`} className="meta text-foreground">
+              {item}
+              <span className="ml-8 text-muted">///</span>
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="overflow-hidden py-3">
+        <div className="marquee-track-reverse flex w-max gap-8 whitespace-nowrap px-4">
+          {rowB.map((item, i) => (
+            <span key={`b-${item}-${i}`} className="meta text-muted">
+              {item}
+              <span className="ml-8 text-foreground/40">✦</span>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -42,7 +42,7 @@ export function CaseStudyModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/80 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/80 p-3 sm:items-center sm:p-4"
       role="presentation"
       onClick={onClose}
     >
@@ -50,7 +50,7 @@ export function CaseStudyModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="surface max-h-[90vh] w-full max-w-lg overflow-y-auto p-6 md:p-8"
+        className="surface max-h-[min(90vh,90dvh)] w-full max-w-lg overflow-y-auto rounded-none border border-[var(--line)] bg-black p-5 sm:p-6 md:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">

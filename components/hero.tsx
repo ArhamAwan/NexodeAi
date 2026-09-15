@@ -1,24 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { hero } from "@/content/site";
-import { RotatingHeadlines } from "@/components/rotating-headlines";
-import { MagneticButton } from "@/components/magnetic-button";
 import { FunnelPanel } from "@/components/funnel-panel";
+import { RotatingHeadlines } from "@/components/rotating-headlines";
 import { trackCta } from "@/lib/analytics";
-
-const AtmosphereCanvas = dynamic(
-  () =>
-    import("@/components/scene/atmosphere-canvas").then(
-      (m) => m.AtmosphereCanvas,
-    ),
-  {
-    ssr: false,
-    loading: () => <div aria-hidden className="absolute inset-0 bg-[#0A0A0A]" />,
-  },
-);
 
 type HeroProps = {
   onPrimary: () => void;
@@ -26,35 +13,80 @@ type HeroProps = {
   compact?: boolean;
 };
 
-function SceneFallback() {
-  return <div aria-hidden className="absolute inset-0 bg-[#0A0A0A]" />;
+function TunnelPreview({
+  className = "",
+  strong = false,
+}: {
+  className?: string;
+  strong?: boolean;
+}) {
+  const rings = strong
+    ? [18, 32, 46, 60, 76, 94]
+    : [28, 42, 56, 70, 84];
+  return (
+    <div className={`tunnel ${className}`} aria-hidden>
+      {rings.map((w, i) => (
+        <div
+          key={w}
+          className={`tunnel-ring ${strong ? "tunnel-ring-strong" : ""}`}
+          style={
+            {
+              "--ring-w": `${w}%`,
+              "--ring-z": `${(i - 2) * -40}px`,
+              "--ring-s": 1,
+              opacity: strong ? 0.45 + i * 0.09 : 0.35 + i * 0.12,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
 }
 
+function PortalBackdrop({ className = "" }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden ${className}`}
+    >
+      <svg
+        className="portal-tunnel h-[185%] w-[185%] max-w-none opacity-90 sm:h-[150%] sm:w-[150%] lg:h-[125%] lg:w-[125%] lg:opacity-100"
+        viewBox="0 0 480 560"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {[40, 80, 125, 175, 230, 295, 360].map((r, i) => (
+          <rect
+            key={r}
+            className="portal-ring"
+            style={{ animationDelay: `${i * 0.45}s` }}
+            x={240 - r * 0.7}
+            y={280 - r}
+            width={r * 1.4}
+            height={r * 2}
+            rx={r}
+            stroke="rgba(232,232,232,0.5)"
+            strokeWidth="1.2"
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * Portal split hero.
+ * Mobile: same copy column as desktop (rings behind); form via sheet.
+ * Desktop: copy left | intake form + rings right.
+ */
 export function Hero({ onPrimary, onSecondary, compact = false }: HeroProps) {
-  const copyRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
-  const trustRef = useRef<HTMLDivElement>(null);
-  const [showScene, setShowScene] = useState(false);
-
-  // Load WebGL after first paint so mobile network isn't blocked by Three.js
-  useEffect(() => {
-    const boot = () => setShowScene(true);
-    const idle =
-      "requestIdleCallback" in window
-        ? window.requestIdleCallback(boot, { timeout: 1200 })
-        : null;
-    const t = window.setTimeout(boot, 350);
-    return () => {
-      if (idle != null) window.cancelIdleCallback?.(idle);
-      window.clearTimeout(t);
-    };
-  }, []);
+  const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const nodes = [copyRef.current, panelRef.current, trustRef.current].filter(
-      Boolean,
-    ) as HTMLElement[];
+    const root = rootRef.current;
+    if (!root) return;
 
+    const nodes = root.querySelectorAll<HTMLElement>("[data-hero-in]");
     const reveal = () => {
       nodes.forEach((el) => {
         el.style.opacity = "1";
@@ -62,9 +94,7 @@ export function Hero({ onPrimary, onSecondary, compact = false }: HeroProps) {
       });
     };
 
-    // Never leave hero blank if GSAP is delayed/interrupted on mobile
-    const failsafe = window.setTimeout(reveal, 800);
-
+    const failsafe = window.setTimeout(reveal, 900);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       reveal();
@@ -73,45 +103,24 @@ export function Hero({ onPrimary, onSecondary, compact = false }: HeroProps) {
     }
 
     const ctx = gsap.context(() => {
-      if (copyRef.current) {
-        gsap.fromTo(
-          copyRef.current,
-          { autoAlpha: 0, y: 18 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.85,
-            ease: "power3.out",
-            onComplete: () => window.clearTimeout(failsafe),
-          },
-        );
-      }
-      if (panelRef.current) {
-        gsap.fromTo(
-          panelRef.current,
-          { autoAlpha: 0, y: 18 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.85,
-            delay: 0.12,
-            ease: "power3.out",
-          },
-        );
-      }
-      if (trustRef.current) {
-        gsap.fromTo(
-          trustRef.current,
-          { autoAlpha: 0 },
-          {
-            autoAlpha: 1,
-            duration: 0.8,
-            delay: 0.35,
-            ease: "power2.out",
-          },
-        );
-      }
-    });
+      gsap.from(nodes, {
+        y: 16,
+        duration: 0.75,
+        stagger: 0.08,
+        ease: "power3.out",
+        clearProps: "transform",
+        onComplete: () => window.clearTimeout(failsafe),
+      });
+      gsap.from(root.querySelectorAll(".portal-ring, .tunnel-ring"), {
+        scale: 0.72,
+        opacity: 0,
+        duration: 1.1,
+        stagger: 0.06,
+        ease: "power3.out",
+        delay: 0.1,
+        clearProps: "opacity,transform",
+      });
+    }, root);
 
     return () => {
       window.clearTimeout(failsafe);
@@ -120,88 +129,132 @@ export function Hero({ onPrimary, onSecondary, compact = false }: HeroProps) {
     };
   }, []);
 
-  if (compact) {
-    return (
-      <section className="relative flex min-h-[70svh] flex-col justify-center overflow-hidden pt-20 pb-16">
-        <div ref={copyRef} className="container-max section-pad relative z-10">
-          <div className="max-w-4xl">
-            <RotatingHeadlines
-              headlines={[
-                "Build software that finally matches what you've built.",
-                "Ship the product your ambition already promised.",
-                "Turn a strong idea into software people trust.",
-              ]}
-              className="font-display text-[1.85rem] leading-[1.08] font-semibold tracking-tight text-balance sm:text-4xl md:text-5xl"
-            />
-          </div>
-          <p className="mt-7 max-w-xl text-[15px] leading-relaxed text-muted md:text-base">
-            {hero.subheadline}
-          </p>
-          <div className="mt-10">
-            <MagneticButton onClick={onPrimary} cta="book_call" ctaLocation="hero_compact">
-              Book a Call
-            </MagneticButton>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const headlineLines = compact ? hero.adsHeadlines : hero.headlines;
 
   return (
     <section
+      ref={rootRef}
       data-funnel-zone="hero"
-      className="relative flex min-h-[100svh] flex-col overflow-hidden pt-16"
+      className={`border-b border-[var(--line)] ${
+        compact ? "min-h-[auto] sm:min-h-[70svh]" : "lg:min-h-[88svh]"
+      }`}
     >
-      {showScene ? <AtmosphereCanvas /> : <SceneFallback />}
+      <div
+        className={`grid min-h-[inherit] grid-cols-1 ${
+          compact ? "" : "lg:grid-cols-2 lg:min-h-[88svh]"
+        }`}
+      >
+        <div
+          className={`relative flex min-w-0 flex-col justify-between overflow-x-clip border-b border-[var(--line)] p-4 sm:p-8 lg:border-r lg:border-b-0 lg:min-h-[88svh] lg:p-10 ${
+            compact
+              ? "sm:min-h-[70svh]"
+              : "min-h-[calc(100svh-3.5rem)] lg:min-h-[88svh]"
+          }`}
+        >
+          {/* Mobile — rings behind the copy fold */}
+          {!compact ? <PortalBackdrop className="lg:hidden" /> : null}
 
-      <div className="container-max section-pad relative z-10 flex flex-1 flex-col justify-center py-6 sm:py-8 lg:py-10">
-        <div className="grid grid-cols-1 items-center gap-8 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_min(380px,36vw)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-14 2xl:grid-cols-[minmax(0,1fr)_420px]">
-          <div ref={copyRef} className="flex min-w-0 flex-col">
-            <div className="relative max-w-3xl 2xl:max-w-4xl">
-              <RotatingHeadlines
-                headlines={hero.headlines}
-                className="font-display text-[1.65rem] leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-4xl md:text-5xl lg:text-[clamp(2.4rem,3.2vw,3.35rem)]"
-              />
-            </div>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-[25%] -left-[40%] hidden h-[75vmin] w-[75vmin] rounded-full bg-foreground opacity-20 lg:block"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-[22%] right-[18%] hidden text-muted lg:block"
+          >
+            +
+          </span>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-[48%] right-[8%] hidden text-muted lg:block"
+          >
+            +
+          </span>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-[68%] right-[28%] hidden text-muted lg:block"
+          >
+            +
+          </span>
 
-            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted sm:mt-6 md:text-base">
+          <p data-hero-in className="meta relative z-10">
+            Studio · Web · Mobile · AI
+          </p>
+
+          <div data-hero-in className="relative z-10 mt-10 w-full max-w-xl lg:mt-0">
+            <RotatingHeadlines
+              headlines={headlineLines}
+              intervalMs={4800}
+              className="font-display w-full text-[clamp(1.65rem,6.5vw,3.25rem)] leading-[1.05] font-semibold tracking-[-0.03em] uppercase lg:text-[clamp(1.85rem,4.2vw,3.25rem)]"
+            />
+            <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted normal-case tracking-normal">
               {hero.subheadline}
             </p>
-
-            <div className="mt-7 flex flex-col items-start gap-4 sm:mt-9 sm:flex-row sm:items-center">
-              <MagneticButton
-                onClick={onPrimary}
-                cta="start_project"
-                ctaLocation="hero"
-              >
-                {hero.primaryCta}
-              </MagneticButton>
+            <div className="mt-8 flex w-full flex-col gap-0 sm:w-auto sm:flex-row sm:flex-wrap">
               <button
                 type="button"
-                className="text-sm text-muted underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                data-cta="book_call"
-                data-cta-location="hero"
+                className="btn-primary btn-stack-mobile"
+                data-cta="start_project"
+                data-cta-location={compact ? "hero_compact" : "hero"}
                 onClick={() => {
-                  trackCta("book_call", "hero");
-                  onSecondary();
+                  trackCta("start_project", compact ? "hero_compact" : "hero");
+                  onPrimary();
                 }}
               >
-                {hero.secondaryCta} →
+                Start a Project
               </button>
+              {!compact ? (
+                <button
+                  type="button"
+                  className="btn-secondary btn-stack-mobile"
+                  data-cta="book_call"
+                  data-cta-location="hero"
+                  onClick={() => {
+                    trackCta("book_call", "hero");
+                    onSecondary();
+                  }}
+                >
+                  Book a Call
+                </button>
+              ) : null}
             </div>
           </div>
 
+          {!compact ? (
+            <div
+              data-hero-in
+              className="relative z-10 mt-12 flex gap-8 border-t border-[var(--line)] pt-6 sm:gap-10 lg:mt-0"
+            >
+              {hero.trust.map((item) => (
+                <div key={item.label}>
+                  <p className="font-display text-2xl font-semibold tracking-tight uppercase md:text-3xl">
+                    {item.value}
+                  </p>
+                  <p className="meta mt-2 max-w-[11rem] normal-case tracking-normal">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="relative z-10 mt-10" />
+          )}
+        </div>
+
+        {compact ? (
+          <div className="relative min-h-[32svh] overflow-hidden bg-black sm:min-h-[36svh]">
+            <TunnelPreview />
+            <p className="meta absolute right-4 bottom-4 z-10">NX-01</p>
+          </div>
+        ) : (
           <aside
-            ref={panelRef}
-            className="glass-panel hidden w-full justify-self-stretch border border-white/20 lg:block"
-            style={{
-              // Slightly stronger blur; denser fill lives on .glass-panel
-              backdropFilter: "blur(28px) saturate(1.2)",
-              WebkitBackdropFilter: "blur(28px) saturate(1.2)",
-            }}
+            data-hero-in
+            className="relative hidden min-h-[88svh] flex-col items-center justify-center overflow-hidden bg-black p-5 lg:flex xl:p-8"
             aria-label="Project intake"
           >
-            <div className="max-h-[min(640px,calc(100svh-11rem))] overflow-y-auto p-5 xl:p-6">
+            <PortalBackdrop />
+
+            <div className="relative z-10 w-full max-w-[min(400px,100%)] max-h-[min(640px,calc(100svh-7rem))] overflow-y-auto border border-[var(--line)] bg-black/90 p-4 xl:p-6">
               <FunnelPanel
                 variant="full"
                 pagePath="/"
@@ -210,24 +263,9 @@ export function Hero({ onPrimary, onSecondary, compact = false }: HeroProps) {
                 className="outline-none"
               />
             </div>
+            <p className="meta absolute right-4 bottom-4 z-10">NX-01</p>
           </aside>
-        </div>
-
-        <div
-          ref={trustRef}
-          className="mt-10 flex flex-wrap gap-8 border-t border-[var(--line)] pt-7 sm:mt-12 sm:gap-10 sm:pt-8 md:gap-14 lg:mt-14"
-        >
-          {hero.trust.map((item) => (
-            <div key={item.label}>
-              <p className="font-display text-3xl font-semibold tracking-tight md:text-4xl">
-                {item.value}
-              </p>
-              <p className="mt-2 max-w-[12rem] text-[13px] text-muted">
-                {item.label}
-              </p>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
     </section>
   );

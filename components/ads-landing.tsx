@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { Funnel } from "@/components/funnel";
 import { Footer } from "@/components/footer";
-import { CalendlyModal } from "@/components/calendly-embed";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
 type AdsLandingProps = {
@@ -13,25 +12,27 @@ type AdsLandingProps = {
 };
 
 export function AdsLanding({ campaign }: AdsLandingProps) {
-  const [calendlyOpen, setCalendlyOpen] = useState(false);
-
   const openFunnel = useCallback(() => {
-    document.getElementById("funnel")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("funnel-bottom")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
   return (
     <SmoothScroll>
-      <Navbar minimal onBookCall={openFunnel} onStartProject={openFunnel} />
-      <main>
-        <Hero onPrimary={openFunnel} onSecondary={openFunnel} compact />
-        <Funnel
-          variant="ads"
-          adCampaign={campaign}
-          pagePath={`/ads/${campaign}`}
-        />
-      </main>
-      <Footer onCta={openFunnel} />
-      <CalendlyModal open={calendlyOpen} onClose={() => setCalendlyOpen(false)} />
+      <div className="min-h-screen overflow-x-clip border-x border-[var(--line)] sm:mx-2 md:mx-3 lg:mx-5">
+        <Navbar minimal onBookCall={openFunnel} onStartProject={openFunnel} />
+        <main>
+          <Hero onPrimary={openFunnel} onSecondary={openFunnel} compact />
+          <Funnel
+            variant="ads"
+            adCampaign={campaign}
+            pagePath={`/ads/${campaign}`}
+            rootId="funnel-bottom"
+          />
+        </main>
+        <Footer onCta={openFunnel} />
+      </div>
     </SmoothScroll>
   );
 }

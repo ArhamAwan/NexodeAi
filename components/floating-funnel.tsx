@@ -36,13 +36,18 @@ export function FloatingFunnel({ register }: FloatingFunnelProps) {
 
   const open = useCallback(() => {
     const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    const hasLanding = Boolean(document.getElementById("funnel-landing"));
 
     if (isDesktop) {
-      if (heroInView()) focusLanding();
-      else scrollToBottom();
+      if (hasLanding && heroInView()) {
+        focusLanding();
+        return;
+      }
+      scrollToBottom();
       return;
     }
 
+    // Mobile: sheet while on hero, otherwise bottom intake
     if (heroInView()) setSheetOpen(true);
     else scrollToBottom();
   }, [focusLanding, scrollToBottom]);
@@ -79,7 +84,7 @@ export function FloatingFunnel({ register }: FloatingFunnelProps) {
         aria-modal="true"
         aria-label="Start a project"
         tabIndex={-1}
-        className="flex max-h-[92vh] w-full flex-col border-t border-[var(--line)] bg-[#111] outline-none"
+        className="flex max-h-[min(92vh,92dvh)] w-full flex-col border-t border-[var(--line)] bg-black pb-[env(safe-area-inset-bottom)] outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3">

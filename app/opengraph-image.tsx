@@ -4,7 +4,7 @@ export const alt = "Nexode AI";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
   return new ImageResponse(
     (
       <div
@@ -14,17 +14,18 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: 80,
-          background: "#0A0A0A",
-          color: "#F4F1EC",
+          background: "#000000",
+          color: "#e8e8e8",
+          padding: 72,
+          border: "2px solid rgba(232,232,232,0.35)",
         }}
       >
         <div
           style={{
-            fontSize: 22,
+            fontSize: 18,
             letterSpacing: 6,
-            color: "#8A8680",
             textTransform: "uppercase",
+            color: "#8a8a8a",
           }}
         >
           Nexode AI
@@ -32,21 +33,23 @@ export default function OpenGraphImage() {
         <div
           style={{
             marginTop: 28,
-            fontSize: 64,
+            fontSize: 72,
             fontWeight: 650,
-            lineHeight: 1.08,
-            maxWidth: 920,
-            letterSpacing: -1.5,
+            lineHeight: 0.95,
+            letterSpacing: -2,
+            textTransform: "uppercase",
+            maxWidth: 900,
           }}
         >
-          Software that makes investors ask how.
+          Ship Product
         </div>
         <div
           style={{
             marginTop: 32,
-            fontSize: 22,
-            color: "#8A8680",
-            letterSpacing: 1,
+            fontSize: 18,
+            letterSpacing: 4,
+            textTransform: "uppercase",
+            color: "#8a8a8a",
           }}
         >
           Web · Mobile · Automation · AI

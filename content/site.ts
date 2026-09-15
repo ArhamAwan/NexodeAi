@@ -21,17 +21,22 @@ export const navLinks = [
 ] as const;
 
 export const hero = {
-  headline:
-    "We build software that finally reflects what you've actually built — and makes people ask how.",
+  headline: "Ship software that makes people ask how.",
   headlines: [
-    "We build software that finally reflects what you've actually built — and makes people ask how.",
-    "Your product should feel as sharp as the idea that started it.",
-    "Ambition outgrew the codebase. We build what comes next.",
-    "Software that earns the double-take — then the question: how?",
-    "We turn what you've built into something the world can finally feel.",
+    "Ship software that makes people ask how.",
+    "Web. Mobile. AI. Built to convert.",
+    "Ambition outgrew the codebase.",
+    "Your next version — already live.",
+    "From brief to production. Fast.",
+  ],
+  adsHeadlines: [
+    "Ship the product your ambition promised.",
+    "Web. Mobile. AI. Built to convert.",
+    "Turn a strong idea into trusted software.",
   ],
   subheadline:
-    "For startups and businesses whose product ambition has outgrown their codebase. Web, mobile, and AI — shipped with craft.",
+    "Nexode AI builds custom web, mobile, and AI products for startups and businesses that need to ship.",
+  proof: "Products live for real businesses.",
   primaryCta: "Start a Project",
   secondaryCta: "Book a Call",
   trust: [
@@ -180,7 +185,7 @@ export const processSteps = [
 
 export const about = {
   studio:
-    "Nexode AI is a software development studio. We partner with startups and businesses to design, build, and ship custom web, mobile, and AI-powered products — without the agency fluff.",
+    "Nexode AI builds custom web, mobile, and AI products for startups and businesses — design, engineering, and launch, without the agency fluff.",
   team: [
     {
       name: "Arham Awan",
@@ -248,7 +253,7 @@ export const reviews = [
 ] as const;
 
 export const megaCta = {
-  lines: ["Let's build", "software", "that moves", "people."],
+  lines: ["Ship", "Product"],
   cta: "Start a Project",
 } as const;
 
